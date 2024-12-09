@@ -1,0 +1,7 @@
+% Определим путь к каталогу с входными файлами и количество потоков обработки
+def INPUT_DIR := q(/data/input);
+def THREAD_COUNT := 4;
+
+app_name = q(Handler data);
+input_directory = INPUT_DIR;
+workers = THREAD_COUNT;

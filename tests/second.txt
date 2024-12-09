@@ -1,0 +1,8 @@
+% Определяем путь к данным
+def DATA_PATH := q(/var/data);
+def RECORD_COUNT := 1000;
+def START_CHAR := $chr 65$; % 65 = 'A'
+
+data_source = DATA_PATH;
+records = RECORD_COUNT;
+labels = [ START_CHAR $chr 66$ $chr 67$ ];
