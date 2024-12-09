@@ -5,19 +5,17 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding='utf-8')
 class ParseError(Exception):
     pass
-
-# -------------------------------------------------------
-# Лексер
-# -------------------------------------------------------
-# Токены:
-# def, :=, =, ;, [ , ], q( ... ), $ ... $ (константные выражения), числа, имена, операции + - *
-# Примерный порядок:
-# def, имя, :=, значение, ;
-# имя, =, значение, ;
-#
-# Значения: число, строка q(...), массив [ ... ], конст. выражение $...$
-# Конст. выражения: $+ имя 1$, $* имя 2$, $- имя 3$, $chr 65$
-
+''' Лексер
+-------------------------------------------------------
+Токены:
+def, :=, =, ;, [ , ], q( ... ), $ ... $ (константные выражения), числа, имена, операции + - *
+Примерный порядок:
+def, имя, :=, значение, ;
+имя, =, значение, ;
+Значения: число, строка q(...), массив [ ... ], конст. выражение $...$
+Конст. выражения: $+ имя 1$, $* имя 2$, $- имя 3$, $chr 65$
+-------------------------------------------------------
+'''
 TOKEN_REGEX = r'''
 (?P<WS>\s+)
 |(?P<DEF>\bdef\b)
@@ -50,25 +48,22 @@ def tokenize(s):
             raise ParseError(f"Unexpected character at position {pos}: {s[pos:pos+10]}")
     return tokens
 
-# -------------------------------------------------------
-# Парсер
-# -------------------------------------------------------
-# Грамматика (примерная):
-#
-# Program: Statement*
-# Statement: DefStatement | KeyValueStatement
-#
-# DefStatement: 'def' NAME ':=' Value ';'
-# KeyValueStatement: NAME '=' Value ';'
-#
-# Value: Number | Qstr | Array | Expr | NAME
-# Array: '[' Value* ']'
-# Expr: '$' ... '$' - константное выражение
-#
-# Константное выражение: $op arg1 arg2$ или $chr num$
-# op ∈ {+, -, *}, arg1, arg2 – либо имя константы, либо число
-# chr – функция chr(num)
-
+'''
+Парсер
+-------------------------------------------------------
+Грамматика (примерная):
+Program: Statement*
+Statement: DefStatement | KeyValueStatement
+DefStatement: 'def' NAME ':=' Value ';'
+KeyValueStatement: NAME '=' Value ';'
+Value: Number | Qstr | Array | Expr | NAME
+Array: '[' Value* ']'
+Expr: '$' ... '$' - константное выражение
+Константное выражение: $op arg1 arg2$ или $chr num$
+op ∈ {+, -, *}, arg1, arg2 – либо имя константы, либо число
+chr – функция chr(num)
+-------------------------------------------------------
+'''
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -185,9 +180,7 @@ class Parser:
             values.append(val)
         return ('array', values)
 
-# -------------------------------------------------------
 # Интерпретация и вычисление
-# -------------------------------------------------------
 
 def evaluate_constants(statements):
     # statements – список ('def', name, val) или ('assign', name, val)
@@ -279,21 +272,21 @@ def main():
     # Считываем весь вход
     input_text = sys.stdin.read()
 
-    # Удаляем комментарии: % ... до конца строки
+    # Удаляем комментарии
     lines = input_text.split('\n')
     no_comments = []
     for line in lines:
-        # Найдём '%'
+        # поиск %
         cpos = line.find('%')
         if cpos != -1:
             line = line[:cpos]
         no_comments.append(line)
     filtered_text = '\n'.join(no_comments)
 
-    # Токенизируем
+    # Токенизация
     tokens = tokenize(filtered_text)
 
-    # Парсим
+    # Парсинг
     parser = Parser(tokens)
     statements = parser.parse_program()
 
